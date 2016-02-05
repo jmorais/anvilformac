@@ -1,3 +1,5 @@
-Welcome to Anvil! 
+Welcome to Anvil!
 
-This application is a couple of years old and could do with a re-write, but I don't have much time to work on it these days. 
+This version does not work with Hammer!
+
+To make it work with PHP sites, your Apache directory root has to be `~/Sites/php`.
