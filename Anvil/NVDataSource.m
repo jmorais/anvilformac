@@ -16,8 +16,10 @@
 
 @property (strong, atomic) CDEvents *powEvents;
 @property (strong, atomic) CDEvents *hammerEvents;
+@property (strong, atomic) CDEvents *phpEvents;
 @property (strong, readwrite, nonatomic) NSMutableArray *apps;
 @property (strong, readwrite, nonatomic) NSMutableArray *hammerApps;
+@property (strong, readwrite, nonatomic) NSMutableArray *phpApps;
 @property (strong, nonatomic) NSFileManager *fileManager;
 
 @end
@@ -42,6 +44,7 @@ static NSString *const kAppsKey = @"apps";
         
         if (!self.fileManager)  self.fileManager =  [NSFileManager defaultManager];
         if (!self.apps)         self.apps =         [[NSMutableArray alloc] init];
+        if (!self.phpApps)         self.phpApps =         [[NSMutableArray alloc] init];
         if (!self.hammerApps)   self.hammerApps =   [[NSMutableArray alloc] init];
 
         [self startWatching];
@@ -79,11 +82,27 @@ static NSString *const kAppsKey = @"apps";
     return dirContents;
 }
 
+- (NSArray *)contentsOfPhpDirectory {
+  
+  NSString *path = [@"~/Sites/php/" stringByExpandingTildeInPath];
+  
+  NSError *error = nil;
+  NSArray *dirContents = [self.fileManager contentsOfDirectoryAtPath:path error:&error];
+  
+  if (error) {
+    NSLog(@"Error reading contents of Php directory: %@", error);
+    return @[];
+  }
+  
+  return dirContents;
+}
+
 // The wrapper function for the whole shebang.
 - (void)readInSavedAppDataFromDisk {
     
     [self clearOldHammerSymlinks];
     [self importFromPowdirectory];
+    [self importFromPhpdirectory];
     [self importNewHammerSites];
 }
 
@@ -270,15 +289,51 @@ static NSString *const kAppsKey = @"apps";
     }
 }
 
+// Step 4
+// Read your php directory and import all the sites.
+- (void)importFromPhpdirectory {
+  
+  NSMutableArray *appsArray = [[NSMutableArray alloc] init];
+  
+  NSArray *dirContents = [self contentsOfPhpDirectory];
+  
+  for (NSString* symlinkName in dirContents) {
+    
+    if ([symlinkName isNotEqualTo:@".DS_Store"]) {
+      
+      NSString *encodedName = [[NSString stringWithFormat:@"~/Sites/php/%@", symlinkName] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+      NSURL *url = [NSURL URLWithString:encodedName];
+      NVApp *thisApp = nil;
+      
+      if (!url) continue;
+      
+      thisApp = [self appByName:symlinkName];
+      
+      // If not, let's add it!
+      if (!thisApp) {
+        thisApp = [[NVApp alloc] initWithURL:url];
+      }
+      
+      // thisApp can be false, or nil. initWithURL can return nil if it doesn't actually initialize properly. Bit of a gotcha.
+      if (thisApp) {
+          [appsArray addObject:thisApp];
+      }
+    }
+  }
+  
+  self.phpApps = appsArray;
+}
+
+
 
 #pragma mark - App management
 
 // Fetch an app from either .hammerApps and apps arrays, using its name.
 - (NVApp *)appByName:(NSString *)name {
-    
+  
     NVApp *thisApp;
     for (NVApp *app in self.apps) {
-        
+      
         if([app.name isEqualToString:name]) {
             
             thisApp = app;
@@ -291,6 +346,14 @@ static NSString *const kAppsKey = @"apps";
             thisApp = app;
         }
     }
+  
+    for (NVApp *app in self.phpApps) {
+      if([app.name isEqualToString:name]) {
+      
+        thisApp = app;
+      }
+    }
+
     return thisApp;
 }
 
@@ -305,6 +368,16 @@ static NSString *const kAppsKey = @"apps";
         }
         i = i + 1;
     }
+  
+    i = 0;
+    for (NVApp* app in self.phpApps) {
+    
+      if ([app.url.path isEqualToString:url.path]) {
+      
+        return i;
+      }
+      i = i + 1;
+    }
     return -1;
 }
 
@@ -317,7 +390,16 @@ static NSString *const kAppsKey = @"apps";
             return app;
         }
     }
-    return nil;
+
+  for (NVApp* app in self.phpApps) {
+    
+    if (app.url == url) {
+      
+      return app;
+    }
+  }
+  
+  return nil;
 }
 
 
@@ -452,6 +534,12 @@ static NSString *const kAppsKey = @"apps";
     return self.hammerApps.count;
 }
 
+- (NSInteger *)numberOfPhpSites {
+  
+  return self.phpApps.count;
+}
+
+
 #pragma mark - FSEvents
 
 - (void)startWatching {
@@ -489,6 +577,22 @@ static NSString *const kAppsKey = @"apps";
         streamCreationFlags:kCDEventsDefaultEventStreamFlags|kFSEventStreamCreateFlagFileEvents];
 
     self.powEvents = powEvents;
+  
+  NSString *phpPath = [@"~/Sites/php/" stringByExpandingTildeInPath];
+  NSURL *phpURL = [NSURL URLWithString:phpPath];
+  NSArray *phpUrls = [[NSMutableArray alloc] initWithObjects:phpURL, nil];
+  
+    CDEvents *phpEvents = [[CDEvents alloc] initWithURLs:phpUrls block:^(CDEvents *watcher, CDEvent *event) {
+    
+    [self importFromPhpdirectory];
+  } onRunLoop:[NSRunLoop mainRunLoop]
+                                  sinceEventIdentifier:kFSEventStreamEventIdSinceNow
+                                  notificationLantency:0.5
+                               ignoreEventsFromSubDirs:NO
+                                           excludeURLs:@[]
+                                   streamCreationFlags:kCDEventsDefaultEventStreamFlags|kFSEventStreamCreateFlagFileEvents];
+  
+  self.phpEvents = phpEvents;
 }
 
 @end

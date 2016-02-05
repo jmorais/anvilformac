@@ -19,7 +19,7 @@
     if (self) {
         
         NVLabel *label = [[NVLabel alloc] initWithFrame:NSMakeRect(9, 4, 120, 16)];
-        [label setText:@"HAMMER SITES"];
+        [label setText:@"PHP SITES"];
         label.font = [NSFont fontWithName:@"Helvetica Neue" size:10];
         [label setTextColor:[NSColor colorWithDeviceRed:129.0/255.0 green:129.0/255.0 blue:129.0/255.0 alpha:1.0]];
         [label setBold:YES];
@@ -38,7 +38,7 @@
 - (void)drawRect:(NSRect)dirtyRect {
     
     [super drawRect:dirtyRect];
-    NSImage *titleBarImage = [NSImage imageNamed:@"HammerHeaderFlat.png"];
+    NSImage *titleBarImage = [NSImage imageNamed:@"HammerHeader.png"];
     
     // This needs to fill the box somehow cleverer than this.. Redcolor fills the row completely.
     CGRect rect = self.bounds;

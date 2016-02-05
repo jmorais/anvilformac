@@ -31,7 +31,7 @@ static NSString *const kPrecomposedAppleTouchIconFileName = @"apple-touch-icon-p
         
         self.name = [url lastPathComponent];
       
-        if ([self.name isEqualToString:@"default"]) {
+        if ([self.name isEqualToString:@"default"] || [self.name isEqualToString:@"logs"]) {
           return false;
         }
     

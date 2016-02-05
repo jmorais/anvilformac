@@ -481,13 +481,19 @@ static NSString *const kPowPath = @"/Library/LaunchDaemons/cx.pow.firewall.plist
 
 - (NSInteger *)numberOfNonHammerSites {
     
-    return self.dataSource.apps.count - self.dataSource.hammerApps.count;
+    return self.dataSource.apps.count - self.dataSource.hammerApps.count - self.dataSource.phpApps.count;
 }
 
 - (BOOL)hasHammerSites {
     
     return (int)self.dataSource.numberOfHammerSites > 0;
 }
+
+- (BOOL)hasPhpSites {
+  
+  return (int)self.dataSource.numberOfPhpSites > 0;
+}
+
 
 - (CGFloat)tableHeight {
     
@@ -563,7 +569,7 @@ static NSString *const kPowPath = @"/Library/LaunchDaemons/cx.pow.firewall.plist
         NSInteger panelY = bottomOfMenubarViewOffset - panelHeight;
         panelRect = CGRectMake(panelRect.origin.x, panelY, PANEL_WIDTH, panelHeight);
         
-    } else if ([[self.dataSource apps] count] == 0 && [[self.dataSource hammerApps] count] == 0) {
+    } else if ([[self.dataSource apps] count] == 0 && [[self.dataSource phpApps] count] == 0) {
         
         self.appListTableView.hidden = YES;
         self.appListTableScrollView.hidden = YES;
@@ -628,9 +634,9 @@ static NSString *const kPowPath = @"/Library/LaunchDaemons/cx.pow.firewall.plist
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView {
     
-    NSInteger sites = self.dataSource.apps.count + self.dataSource.hammerApps.count;
+    NSInteger sites = self.dataSource.apps.count + self.dataSource.phpApps.count;
 
-    if (self.dataSource.hammerApps.count > 0) {
+    if (self.dataSource.phpApps.count > 0) {
         
         sites += 1;
     }
@@ -658,7 +664,7 @@ static NSString *const kPowPath = @"/Library/LaunchDaemons/cx.pow.firewall.plist
         
         NSTableCellView *view = [self.appListTableView viewAtColumn:0 row:i makeIfNecessary:NO];
         
-        if (view && i == self.appListTableView.selectedRow && i < [self hammerGroupHeaderRowNumber]) {
+        if (view && i == self.appListTableView.selectedRow && i < [self phpGroupHeaderRowNumber]) {
             
             NVTableRowView *rowView = [self.appListTableView rowViewAtRow:i makeIfNecessary:NO];
             NVTableCellView *cellView = [self.appListTableView viewAtColumn:0 row:i makeIfNecessary:NO];
@@ -684,36 +690,32 @@ static NSString *const kPowPath = @"/Library/LaunchDaemons/cx.pow.firewall.plist
     NVApp *app;
     NVTableCellView *cellView = (NVTableCellView *)[tableView makeViewWithIdentifier:kAppListTableCellIdentifier owner:self];
     
-    NSInteger hammerGroupHeaderRowNumber = [self hammerGroupHeaderRowNumber];
+    NSInteger phpGroupHeaderRowNumber = [self phpGroupHeaderRowNumber];
     
-    if (row < hammerGroupHeaderRowNumber) {
+    if (row < phpGroupHeaderRowNumber) {
         
         app = [self.dataSource.apps objectAtIndex:row];
-    } else if (row > hammerGroupHeaderRowNumber && row > 0){
+    } else if (row > phpGroupHeaderRowNumber && row > 0){
         
-        long hammerGroupRow = row - self.dataSource.apps.count - 1;
-        app = [self.dataSource.hammerApps objectAtIndex:hammerGroupRow];
-    } else if (row == hammerGroupHeaderRowNumber){
+        long phpGroupRow = row - self.dataSource.apps.count - 1;
+        app = [self.dataSource.phpApps objectAtIndex:phpGroupRow];
+    } else if (row == phpGroupHeaderRowNumber){
         
         return [[NVGroupHeaderTableCellView alloc] init];
     }
     
-    cellView.isHammer = (row > hammerGroupHeaderRowNumber && row > 0);
+    cellView.isHammer = FALSE;
     
-    if (cellView.isHammer) {
-        
-        [cellView.siteLabel setText:[app.name stringByReplacingOccurrencesOfString:@".hammer" withString:@""]];
-    } else {
-        
-        [cellView.siteLabel setText:app.name];
-    }
+  
+    [cellView.siteLabel setText:app.name];
     
-    cellView.darkTopBorder = (row == (hammerGroupHeaderRowNumber+1));
-    cellView.hideBottomBorder = (row == (hammerGroupHeaderRowNumber-1));
+    
+    cellView.darkTopBorder = (row == (phpGroupHeaderRowNumber+1));
+    cellView.hideBottomBorder = (row == (phpGroupHeaderRowNumber-1));
     cellView.hideTopBorder = NO;
     
-    if ((self.dataSource.hammerApps.count > 0 && row == self.dataSource.apps.count+self.dataSource.hammerApps.count) ||
-        (self.dataSource.hammerApps.count == 0 && row == self.dataSource.apps.count-1)) {
+    if ((self.dataSource.phpApps.count > 0 && row == self.dataSource.apps.count+self.dataSource.phpApps.count) ||
+        (self.dataSource.phpApps.count == 0 && row == self.dataSource.apps.count-1)) {
         cellView.hideBottomBorder = YES;
     }
         
@@ -752,12 +754,12 @@ static NSString *const kPowPath = @"/Library/LaunchDaemons/cx.pow.firewall.plist
 
 - (BOOL)tableView:(NSTableView *)tableView isGroupRow:(NSInteger)row {
     
-    return row == [self hammerGroupHeaderRowNumber];
+    return row == [self phpGroupHeaderRowNumber];
 }
 
 - (double)tableView:(NSTableView *)tableView heightOfRow:(NSInteger)row {
     
-    NSInteger groupHeaderRowNumber = [self hammerGroupHeaderRowNumber];
+    NSInteger groupHeaderRowNumber = [self phpGroupHeaderRowNumber];
     if (row == (groupHeaderRowNumber + 1)) {
         
         return 33;
@@ -785,10 +787,22 @@ static NSString *const kPowPath = @"/Library/LaunchDaemons/cx.pow.firewall.plist
     return number;
 }
 
+- (NSInteger)phpGroupHeaderRowNumber {
+  
+  int number = (int)[NVDataSource sharedDataSource].apps.count; //- (int)[NVDataSource sharedDataSource].hammerApps.count + 1;
+  
+  if ((int)[NVDataSource sharedDataSource].numberOfPhpSites == 0) {
+    
+    return number + 100;
+  }
+  
+  return number;
+}
+
 - (NSTableRowView *)tableView:(NSTableView *)tableView rowViewForRow:(NSInteger)row {
     
-    // Hammer sites bar
-    NSInteger groupHeaderRowNumber = [self hammerGroupHeaderRowNumber];
+    // PHP sites bar
+    NSInteger groupHeaderRowNumber = [self phpGroupHeaderRowNumber];
     
     if (row == groupHeaderRowNumber) {
         
@@ -1016,7 +1030,7 @@ static NSString *const kPowPath = @"/Library/LaunchDaemons/cx.pow.firewall.plist
     
     NSMenu *menu = [[NSMenu alloc] initWithTitle:@"Site Menu"];
     
-    if (self.appListTableView.selectedRow == [self hammerGroupHeaderRowNumber]) {
+    if (self.appListTableView.selectedRow == [self phpGroupHeaderRowNumber]) {
         
         return nil;
     }
@@ -1058,7 +1072,7 @@ static NSString *const kPowPath = @"/Library/LaunchDaemons/cx.pow.firewall.plist
     }
 
 
-    if (self.appListTableView.selectedRow < [self hammerGroupHeaderRowNumber]) {
+    if (self.appListTableView.selectedRow < [self phpGroupHeaderRowNumber]) {
         
         [menu addItem:[NSMenuItem separatorItem]];
         
@@ -1161,17 +1175,17 @@ static NSString *const kPowPath = @"/Library/LaunchDaemons/cx.pow.firewall.plist
 - (NVApp *)appForSelectedRow:(NSInteger)row {
     
     NVApp *app;
-    NSInteger hammerGroupHeaderRowNumber = [self hammerGroupHeaderRowNumber];
-    if (row < hammerGroupHeaderRowNumber) {
+    NSInteger phpGroupHeaderRowNumber = [self phpGroupHeaderRowNumber];
+    if (row < phpGroupHeaderRowNumber) {
         
         if (row < self.dataSource.apps.count) {
             app = [self.dataSource.apps objectAtIndex:row];
         }
-    } else if (row > hammerGroupHeaderRowNumber && row > 0){
+    } else if (row > phpGroupHeaderRowNumber && row > 0){
         
         row = row - self.dataSource.apps.count - 1;
-        if (row < self.dataSource.hammerApps.count) {
-            app = [self.dataSource.hammerApps objectAtIndex:row];
+        if (row < self.dataSource.phpApps.count) {
+            app = [self.dataSource.phpApps objectAtIndex:row];
         }
     } else {
         return nil;
@@ -1349,7 +1363,7 @@ static NSString *const kPowPath = @"/Library/LaunchDaemons/cx.pow.firewall.plist
     
     // If last app is removed, forcing the panel to close before updating height prevents crash
     
-    if ([[self.dataSource apps] count] == 0 && [[self.dataSource hammerApps] count] == 0) {
+    if ([[self.dataSource apps] count] == 0 && [[self.dataSource phpApps] count] == 0) {
         [self closePanel];
     }
     

@@ -13,6 +13,7 @@
 
 @property (strong, readonly, nonatomic) NSMutableArray *apps;
 @property (strong, readonly, nonatomic) NSMutableArray *hammerApps;
+@property (strong, readonly, nonatomic) NSMutableArray *phpApps;
 
 - (void)readInSavedAppDataFromDisk;
 + (NVDataSource *)sharedDataSource;
@@ -21,5 +22,6 @@
 - (NVApp *)findAppWithURL:(NSURL *)url;
 - (NSInteger)indexOfAppWithURL:(NSURL *)url;
 - (NSInteger *)numberOfHammerSites;
+- (NSInteger *)numberOfPhpSites;
 
 @end
