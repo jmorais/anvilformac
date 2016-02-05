@@ -27,15 +27,15 @@
     
     if (retinaScreen) {
         
-        switcherImage = [NSImage imageNamed:@"Switch@2x.png"];
-        backgroundImage = [NSImage imageNamed:@"SwitchInactive@2x.png"];
+        switcherImage = [NSImage imageNamed:@"switchButton@2x.png"];
+        backgroundImage = [NSImage imageNamed:@"switchInactive@2x.png"];
     } else {
         
-        switcherImage = [NSImage imageNamed:@"Switch.png"];
-        backgroundImage = [NSImage imageNamed:@"SwitchInactive.png"];
+        switcherImage = [NSImage imageNamed:@"switchButton.png"];
+        backgroundImage = [NSImage imageNamed:@"switchInactive.png"];
     }
     
-    CGRect rect = CGRectMake(0, 0, switcherImage.size.width, switcherImage.size.height);
+    CGRect rect = CGRectMake(0, 4, switcherImage.size.width, switcherImage.size.height);
     
     NSInteger x = self.frame.origin.x;
     NSInteger y = self.frame.origin.y - floor((switcherImage.size.height - self.frame.size.height) / 2);
@@ -94,20 +94,20 @@
     
     if (position) {
         
-        lastViewFrame.origin.x = self.frame.size.width - lastViewFrame.size.width;
+        lastViewFrame.origin.x = (self.frame.size.width - lastViewFrame.size.width) - 5;
         
         if (retinaScreen) {
-            self.backgroundView.backgroundImage = [NSImage imageNamed:@"SwitchActive@2x.png"];
+            self.backgroundView.backgroundImage = [NSImage imageNamed:@"switchActive@2x.png"];
         } else {
-            self.backgroundView.backgroundImage = [NSImage imageNamed:@"SwitchActive.png"];
+            self.backgroundView.backgroundImage = [NSImage imageNamed:@"switchActive.png"];
         }
     } else {
         
-        lastViewFrame.origin.x = 0;
+        lastViewFrame.origin.x = 4;
         if (retinaScreen) {
-            self.backgroundView.backgroundImage = [NSImage imageNamed:@"SwitchInactive@2x.png"];
+            self.backgroundView.backgroundImage = [NSImage imageNamed:@"switchInactive@2x.png"];
         } else {
-            self.backgroundView.backgroundImage = [NSImage imageNamed:@"SwitchInactive.png"];
+            self.backgroundView.backgroundImage = [NSImage imageNamed:@"switchInactive.png"];
         }
     }
     

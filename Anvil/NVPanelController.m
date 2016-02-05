@@ -79,14 +79,14 @@ static NSString *const kPowPath = @"/Library/LaunchDaemons/cx.pow.firewall.plist
         
         [self.switchLabel setAlphaValue:0.9999999];
         [self.headerView makeTransparent];
-        self.headerView.backgroundImage = [NSImage imageNamed:@"Titlebar"];
+        self.headerView.backgroundImage = [NSImage imageNamed:@"titleBar"];
         self.headerIconView.backgroundImage = [NSImage imageNamed:@"TitlebarIcon"];
         
-        self.backgroundView.backgroundColor = [NSColor colorWithDeviceRed:244.0/255.0 green:244.0/255.0 blue:244.0/255.0 alpha:1];
+        self.backgroundView.backgroundColor = [NSColor colorWithDeviceRed:249.0/255.0 green:249.0/255.0 blue:249.0/255.0 alpha:1];
         
         self.appListTableView.menu = [self menuForTableView];
         self.appListTableView.action = @selector(appListTableViewClicked:);
-        self.appListTableView.backgroundColor = [NSColor colorWithDeviceRed:244.0/255.0 green:244.0/255.0 blue:244.0/255.0 alpha:1];
+        self.appListTableView.backgroundColor = [NSColor colorWithDeviceRed:249.0/255.0 green:249.0/255.0 blue:249.0/255.0 alpha:1];
         self.appListTableView.delegate = self;
         
         self.appListTableScrollView.wantsLayer = YES;
@@ -96,39 +96,40 @@ static NSString *const kPowPath = @"/Library/LaunchDaemons/cx.pow.firewall.plist
         [self.appListTableView setIntercellSpacing:NSMakeSize(0, 0)];
         
         NSShadow *shadow = [[NSShadow alloc] init];
-        shadow.shadowColor = [NSColor colorWithDeviceRed:1.0 green:1.0 blue:1.0 alpha:0.4];
+        shadow.shadowColor = [NSColor colorWithDeviceRed:1.0 green:1.0 blue:1.0 alpha:0.0];
         shadow.shadowOffset = NSMakeSize(0, -1);
         shadow.shadowBlurRadius = 0.0;
         self.switchLabel.textShadow = shadow;
         
-        self.addButton.image            = [NSImage imageNamed:@"AddButton"];
-        self.addButton.alternateImage   = [NSImage imageNamed:@"AddButtonPushed"];
+        self.addButton.image            = [NSImage imageNamed:@"addButtonInactive"];
+        self.addButton.alternateImage   = [NSImage imageNamed:@"addButtonActive"];
         
-        self.settingsDivider.backgroundImage = [NSImage imageNamed:@"TitlebarSplit"];
+        self.settingsDivider.backgroundColor = [NSColor colorWithDeviceRed:255.0/255.0 green:255.0/255.0 blue:255.0/255.0 alpha:1];
         
         [self setupSettingsButton];
         
-        self.installPowButton.image = [NSImage imageNamed:@"BlueButton"];
-        self.installPowButton.alternateImage = [NSImage imageNamed:@"BlueButtonPushed"];
+        self.installPowButton.image = [NSImage imageNamed:@"blueButton"];
+        self.installPowButton.alternateImage = [NSImage imageNamed:@"blueButtonPushed"];
         self.installPowButton.isBold = NO;
         self.installPowButton.textSize = 12.0;
         
-        self.noSitesAddASiteButton.image = [NSImage imageNamed:@"ButtonAdd"];
-        self.noSitesAddASiteButton.alternateImage = [NSImage imageNamed:@"ButtonAddPushed"];
+        self.noSitesAddASiteButton.image = [NSImage imageNamed:@"buttonAddLong"];
+        self.noSitesAddASiteButton.alternateImage = [NSImage imageNamed:@"buttonAddPushedLong"];
         [self.noSitesAddASiteButton setInsetsWithTop:1.0 right:5.0 bottom:1.0 left:30.0];
         self.noSitesAddASiteButton.textSize = 12.0;
         self.noSitesAddASiteButton.isBold = NO;
         
         CGRect frame = self.welcomeView.frame;
-        self.welcomeView.backgroundColor = [NSColor colorWithDeviceRed:246.0/255.0 green:246.0/255.0 blue:246.0/255.0 alpha:1.0];
+        self.welcomeView.backgroundColor = [NSColor colorWithDeviceRed:245.0/255.0 green:244.0/255.0 blue:245.0/255.0 alpha:1.0];
         [self.welcomeView setFrame:CGRectMake(frame.origin.x,
-                                              self.backgroundView.frame.size.height - frame.size.height - HEADER_HEIGHT,
+                                              self.backgroundView.frame.size.height - frame.size.height - HEADER_HEIGHT - 5,
                                               frame.size.width,
                                               frame.size.height)];
         
         frame = self.noAppsView.frame;
+        self.noAppsView.backgroundColor = [NSColor colorWithDeviceRed:245.0/255.0 green:244.0/255.0 blue:245.0/255.0 alpha:1.0];
         [self.noAppsView setFrame:CGRectMake(frame.origin.x,
-                                             self.backgroundView.frame.size.height - frame.size.height - HEADER_HEIGHT,
+                                             self.backgroundView.frame.size.height - frame.size.height - HEADER_HEIGHT - 5,
                                              frame.size.width,
                                              frame.size.height)];
         
@@ -190,8 +191,8 @@ static NSString *const kPowPath = @"/Library/LaunchDaemons/cx.pow.firewall.plist
 
 - (void)setupSettingsButton {
     
-    self.settingsButton.image           = [NSImage imageNamed:@"SettingsButton"];
-    self.settingsButton.alternateImage  = [NSImage imageNamed:@"SettingsButtonPushed"];
+    self.settingsButton.image           = [NSImage imageNamed:@"settingsButton"];
+    self.settingsButton.alternateImage  = [NSImage imageNamed:@"settingsButtonPushed"];
     
     NSMenu *settingsMenu = [self buildSettingsMenu];
     
@@ -203,7 +204,7 @@ static NSString *const kPowPath = @"/Library/LaunchDaemons/cx.pow.firewall.plist
     NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:@""
                                                   action:NULL
                                            keyEquivalent:@""];
-    item.image = [NSImage imageNamed:@"SettingsButton"];
+    item.image = [NSImage imageNamed:@"settingsButton"];
     item.onStateImage = nil;
     item.mixedStateImage = nil;
     
@@ -213,7 +214,7 @@ static NSString *const kPowPath = @"/Library/LaunchDaemons/cx.pow.firewall.plist
     cell.imagePosition = NSImageOnly;
     cell.arrowPosition = NSPopUpNoArrow;
     cell.usesItemFromMenu = NO;
-    cell.alternateImage = [NSImage imageNamed:@"SettingsButtonPushed"];
+    cell.alternateImage = [NSImage imageNamed:@"settingsButtonPushed"];
 }
 
 - (NSMenu *)buildSettingsMenu {
@@ -233,6 +234,9 @@ static NSString *const kPowPath = @"/Library/LaunchDaemons/cx.pow.firewall.plist
     [settingsMenu addItem:launchOnLoginItem];
     [settingsMenu addItem:[[NSMenuItem alloc] initWithTitle:@"Check for Updates..." action:@selector(didClickCheckForUpdates:) keyEquivalent:@""]];
     [settingsMenu addItem:[[NSMenuItem alloc] initWithTitle:@"Support & FAQs" action:@selector(didClickSupportMenuItem:) keyEquivalent:@""]];
+    [settingsMenu addItem:[NSMenuItem separatorItem]];
+    [settingsMenu addItem:[[NSMenuItem alloc] initWithTitle:@"🔨  Try Hammer" action:@selector(didClickTryHammer:) keyEquivalent:@""]];
+    [settingsMenu addItem:[[NSMenuItem alloc] initWithTitle:@"🔥  Try Forge" action:@selector(didClickTryForge:) keyEquivalent:@""]];
     [settingsMenu addItem:[NSMenuItem separatorItem]];
     [settingsMenu addItem:[[NSMenuItem alloc] initWithTitle:@"Restart Pow" action:@selector(didClickRestartPow:) keyEquivalent:@""]];
     [settingsMenu addItem:[[NSMenuItem alloc] initWithTitle:@"Uninstall Pow" action:@selector(uninstallPow:) keyEquivalent:@""]];
@@ -477,13 +481,19 @@ static NSString *const kPowPath = @"/Library/LaunchDaemons/cx.pow.firewall.plist
 
 - (NSInteger *)numberOfNonHammerSites {
     
-    return self.dataSource.apps.count - self.dataSource.hammerApps.count;
+    return self.dataSource.apps.count - self.dataSource.hammerApps.count - self.dataSource.phpApps.count;
 }
 
 - (BOOL)hasHammerSites {
     
     return (int)self.dataSource.numberOfHammerSites > 0;
 }
+
+- (BOOL)hasPhpSites {
+  
+  return (int)self.dataSource.numberOfPhpSites > 0;
+}
+
 
 - (CGFloat)tableHeight {
     
@@ -546,8 +556,12 @@ static NSString *const kPowPath = @"/Library/LaunchDaemons/cx.pow.firewall.plist
         
         self.appListTableView.hidden = YES;
         self.appListTableScrollView.hidden = YES;
+        self.switchView.hidden = YES;
+        self.switchLabel.hidden = YES;
+        self.addButton.hidden = YES;
         self.noAppsView.hidden = YES;
         self.welcomeView.hidden = NO;
+        self.welcomeLabel.hidden = NO;
         
         // In this case, appListTableView can actually be tall without being visible!
 
@@ -555,12 +569,16 @@ static NSString *const kPowPath = @"/Library/LaunchDaemons/cx.pow.firewall.plist
         NSInteger panelY = bottomOfMenubarViewOffset - panelHeight;
         panelRect = CGRectMake(panelRect.origin.x, panelY, PANEL_WIDTH, panelHeight);
         
-    } else if ([[self.dataSource apps] count] == 0 && [[self.dataSource hammerApps] count] == 0) {
+    } else if ([[self.dataSource apps] count] == 0 && [[self.dataSource phpApps] count] == 0) {
         
         self.appListTableView.hidden = YES;
         self.appListTableScrollView.hidden = YES;
         self.noAppsView.hidden = NO;
+        self.addButton.hidden = YES;
+        self.switchLabel.hidden = NO;
+        self.switchView.hidden = NO;
         self.welcomeView.hidden = YES;
+        self.welcomeLabel.hidden = YES;
         
         panelHeight = self.noAppsView.frame.size.height + HEADER_HEIGHT + ARROW_HEIGHT;
         NSInteger panelY = bottomOfMenubarViewOffset - panelHeight;
@@ -570,7 +588,11 @@ static NSString *const kPowPath = @"/Library/LaunchDaemons/cx.pow.firewall.plist
         self.appListTableView.hidden = NO;
         self.appListTableScrollView.hidden = NO;
         self.noAppsView.hidden = YES;
+        self.addButton.hidden = NO;
+        self.switchLabel.hidden = NO;
+        self.switchView.hidden = NO;
         self.welcomeView.hidden = YES;
+        self.welcomeLabel.hidden = YES;
     }
     
     if (panel.alphaValue < 1) {
@@ -612,9 +634,9 @@ static NSString *const kPowPath = @"/Library/LaunchDaemons/cx.pow.firewall.plist
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView {
     
-    NSInteger sites = self.dataSource.apps.count + self.dataSource.hammerApps.count;
+    NSInteger sites = self.dataSource.apps.count + self.dataSource.phpApps.count;
 
-    if (self.dataSource.hammerApps.count > 0) {
+    if (self.dataSource.phpApps.count > 0) {
         
         sites += 1;
     }
@@ -642,7 +664,7 @@ static NSString *const kPowPath = @"/Library/LaunchDaemons/cx.pow.firewall.plist
         
         NSTableCellView *view = [self.appListTableView viewAtColumn:0 row:i makeIfNecessary:NO];
         
-        if (view && i == self.appListTableView.selectedRow && i < [self hammerGroupHeaderRowNumber]) {
+        if (view && i == self.appListTableView.selectedRow && i < [self phpGroupHeaderRowNumber]) {
             
             NVTableRowView *rowView = [self.appListTableView rowViewAtRow:i makeIfNecessary:NO];
             NVTableCellView *cellView = [self.appListTableView viewAtColumn:0 row:i makeIfNecessary:NO];
@@ -668,36 +690,32 @@ static NSString *const kPowPath = @"/Library/LaunchDaemons/cx.pow.firewall.plist
     NVApp *app;
     NVTableCellView *cellView = (NVTableCellView *)[tableView makeViewWithIdentifier:kAppListTableCellIdentifier owner:self];
     
-    NSInteger hammerGroupHeaderRowNumber = [self hammerGroupHeaderRowNumber];
+    NSInteger phpGroupHeaderRowNumber = [self phpGroupHeaderRowNumber];
     
-    if (row < hammerGroupHeaderRowNumber) {
+    if (row < phpGroupHeaderRowNumber) {
         
         app = [self.dataSource.apps objectAtIndex:row];
-    } else if (row > hammerGroupHeaderRowNumber && row > 0){
+    } else if (row > phpGroupHeaderRowNumber && row > 0){
         
-        long hammerGroupRow = row - self.dataSource.apps.count - 1;
-        app = [self.dataSource.hammerApps objectAtIndex:hammerGroupRow];
-    } else if (row == hammerGroupHeaderRowNumber){
+        long phpGroupRow = row - self.dataSource.apps.count - 1;
+        app = [self.dataSource.phpApps objectAtIndex:phpGroupRow];
+    } else if (row == phpGroupHeaderRowNumber){
         
         return [[NVGroupHeaderTableCellView alloc] init];
     }
     
-    cellView.isHammer = (row > hammerGroupHeaderRowNumber && row > 0);
+    cellView.isHammer = FALSE;
     
-    if (cellView.isHammer) {
-        
-        [cellView.siteLabel setText:[app.name stringByReplacingOccurrencesOfString:@".hammer" withString:@""]];
-    } else {
-        
-        [cellView.siteLabel setText:app.name];
-    }
+  
+    [cellView.siteLabel setText:app.name];
     
-    cellView.darkTopBorder = (row == (hammerGroupHeaderRowNumber+1));
-    cellView.hideBottomBorder = (row == (hammerGroupHeaderRowNumber-1));
+    
+    cellView.darkTopBorder = (row == (phpGroupHeaderRowNumber+1));
+    cellView.hideBottomBorder = (row == (phpGroupHeaderRowNumber-1));
     cellView.hideTopBorder = NO;
     
-    if ((self.dataSource.hammerApps.count > 0 && row == self.dataSource.apps.count+self.dataSource.hammerApps.count) ||
-        (self.dataSource.hammerApps.count == 0 && row == self.dataSource.apps.count-1)) {
+    if ((self.dataSource.phpApps.count > 0 && row == self.dataSource.apps.count+self.dataSource.phpApps.count) ||
+        (self.dataSource.phpApps.count == 0 && row == self.dataSource.apps.count-1)) {
         cellView.hideBottomBorder = YES;
     }
         
@@ -720,7 +738,7 @@ static NSString *const kPowPath = @"/Library/LaunchDaemons/cx.pow.firewall.plist
     
         cellView.faviconImageView.backgroundImage = [NSImage imageNamed:@"SiteIcon"];
 //        NSImage *faviconImage = [[NSImage alloc] initWithContentsOfURL:app.faviconURL];
-        
+      
         cellView.faviconImageView.foregroundImage = [self imageRepresentationOfImage:app.faviconImage
                                                                             withSize:NSMakeSize(32, 32)];
     } else {
@@ -736,12 +754,12 @@ static NSString *const kPowPath = @"/Library/LaunchDaemons/cx.pow.firewall.plist
 
 - (BOOL)tableView:(NSTableView *)tableView isGroupRow:(NSInteger)row {
     
-    return row == [self hammerGroupHeaderRowNumber];
+    return row == [self phpGroupHeaderRowNumber];
 }
 
 - (double)tableView:(NSTableView *)tableView heightOfRow:(NSInteger)row {
     
-    NSInteger groupHeaderRowNumber = [self hammerGroupHeaderRowNumber];
+    NSInteger groupHeaderRowNumber = [self phpGroupHeaderRowNumber];
     if (row == (groupHeaderRowNumber + 1)) {
         
         return 33;
@@ -769,10 +787,22 @@ static NSString *const kPowPath = @"/Library/LaunchDaemons/cx.pow.firewall.plist
     return number;
 }
 
+- (NSInteger)phpGroupHeaderRowNumber {
+  
+  int number = (int)[NVDataSource sharedDataSource].apps.count; //- (int)[NVDataSource sharedDataSource].hammerApps.count + 1;
+  
+  if ((int)[NVDataSource sharedDataSource].numberOfPhpSites == 0) {
+    
+    return number + 100;
+  }
+  
+  return number;
+}
+
 - (NSTableRowView *)tableView:(NSTableView *)tableView rowViewForRow:(NSInteger)row {
     
-    // Hammer sites bar
-    NSInteger groupHeaderRowNumber = [self hammerGroupHeaderRowNumber];
+    // PHP sites bar
+    NSInteger groupHeaderRowNumber = [self phpGroupHeaderRowNumber];
     
     if (row == groupHeaderRowNumber) {
         
@@ -802,6 +832,14 @@ static NSString *const kPowPath = @"/Library/LaunchDaemons/cx.pow.firewall.plist
         
         if (CGSizeEqualToSize(representation.size, size)) {
             requestedRepresentationImage = [[NSImage alloc] initWithData:[representation TIFFRepresentation]];
+        } else {
+          NSImage *sourceImage = image;
+          requestedRepresentationImage = [[NSImage alloc] initWithSize: size];
+          [requestedRepresentationImage lockFocus];
+          [sourceImage setSize: size];
+          [[NSGraphicsContext currentContext] setImageInterpolation:NSImageInterpolationHigh];
+          [sourceImage drawAtPoint:NSZeroPoint fromRect:CGRectMake(0, 0, size.width, size.height) operation:NSCompositeCopy fraction:1.0];
+          [requestedRepresentationImage unlockFocus];
         }
     }
     
@@ -992,7 +1030,7 @@ static NSString *const kPowPath = @"/Library/LaunchDaemons/cx.pow.firewall.plist
     
     NSMenu *menu = [[NSMenu alloc] initWithTitle:@"Site Menu"];
     
-    if (self.appListTableView.selectedRow == [self hammerGroupHeaderRowNumber]) {
+    if (self.appListTableView.selectedRow == [self phpGroupHeaderRowNumber]) {
         
         return nil;
     }
@@ -1034,7 +1072,7 @@ static NSString *const kPowPath = @"/Library/LaunchDaemons/cx.pow.firewall.plist
     }
 
 
-    if (self.appListTableView.selectedRow < [self hammerGroupHeaderRowNumber]) {
+    if (self.appListTableView.selectedRow < [self phpGroupHeaderRowNumber]) {
         
         [menu addItem:[NSMenuItem separatorItem]];
         
@@ -1137,17 +1175,17 @@ static NSString *const kPowPath = @"/Library/LaunchDaemons/cx.pow.firewall.plist
 - (NVApp *)appForSelectedRow:(NSInteger)row {
     
     NVApp *app;
-    NSInteger hammerGroupHeaderRowNumber = [self hammerGroupHeaderRowNumber];
-    if (row < hammerGroupHeaderRowNumber) {
+    NSInteger phpGroupHeaderRowNumber = [self phpGroupHeaderRowNumber];
+    if (row < phpGroupHeaderRowNumber) {
         
         if (row < self.dataSource.apps.count) {
             app = [self.dataSource.apps objectAtIndex:row];
         }
-    } else if (row > hammerGroupHeaderRowNumber && row > 0){
+    } else if (row > phpGroupHeaderRowNumber && row > 0){
         
         row = row - self.dataSource.apps.count - 1;
-        if (row < self.dataSource.hammerApps.count) {
-            app = [self.dataSource.hammerApps objectAtIndex:row];
+        if (row < self.dataSource.phpApps.count) {
+            app = [self.dataSource.phpApps objectAtIndex:row];
         }
     } else {
         return nil;
@@ -1322,7 +1360,17 @@ static NSString *const kPowPath = @"/Library/LaunchDaemons/cx.pow.firewall.plist
     NSIndexSet *thisIndexSet = [NSIndexSet indexSetWithIndex:clickedRow];
     [self.appListTableView removeRowsAtIndexes:thisIndexSet withAnimation:NSTableViewAnimationEffectFade];
     
+    
+    // If last app is removed, forcing the panel to close before updating height prevents crash
+    
+    if ([[self.dataSource apps] count] == 0 && [[self.dataSource phpApps] count] == 0) {
+        [self closePanel];
+    }
+    
     [self updatePanelHeightAndAnimate:YES];
+    
+    
+    
 }
 
 - (IBAction)didClickRestartButton:(id)sender {
@@ -1348,6 +1396,18 @@ static NSString *const kPowPath = @"/Library/LaunchDaemons/cx.pow.firewall.plist
     
     NSURL *supportURL = [NSURL URLWithString:@"http://anvilformac.com/support"];
     [[NSWorkspace sharedWorkspace] openURL:supportURL];
+}
+
+- (void) didClickTryForge:(id)sender {
+    // handle forge opening
+    NSURL *forgeURL = [NSURL URLWithString:@"https://getforge.com"];
+    [[NSWorkspace sharedWorkspace] openURL:forgeURL];
+}
+
+- (void) didClickTryHammer:(id)sender {
+    // handle Hammer opening
+    NSURL *hammerURL = [NSURL URLWithString:@"http://hammerformac.com"];
+    [[NSWorkspace sharedWorkspace] openURL:hammerURL];
 }
 
 - (void)didClickShowAbout:(id)sender {
