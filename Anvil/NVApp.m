@@ -18,6 +18,8 @@
 @implementation NVApp
 
 static NSString *const kFaviconFileName = @"favicon.ico";
+static NSString *const kFaviconFileNameAlternative = @"favicon.png";
+
 static NSString *const kAppleTouchIconFileName = @"apple-touch-icon.png";
 static NSString *const kPrecomposedAppleTouchIconFileName = @"apple-touch-icon-precomposed.png";
 
@@ -28,6 +30,10 @@ static NSString *const kPrecomposedAppleTouchIconFileName = @"apple-touch-icon-p
     if(self) {
         
         self.name = [url lastPathComponent];
+      
+        if ([self.name isEqualToString:@"default"]) {
+          return false;
+        }
     
         NSString *stringWithSymlinks = [NSString stringWithFormat:@"file://%@", [url.path stringByExpandingTildeInPath]];
 
@@ -81,19 +87,21 @@ static NSString *const kPrecomposedAppleTouchIconFileName = @"apple-touch-icon-p
     
     NSURL *faviconURL = nil; //[self.url URLByAppendingPathComponent:@"public/favicon.ico"];
     NSArray *enumeratorKeys = [NSArray arrayWithObject:NSURLIsDirectoryKey];
-    NSDirectoryEnumerator *enumerator = [fileManager enumeratorAtURL:self.url includingPropertiesForKeys:enumeratorKeys options:0 errorHandler:NULL];
+    NSDirectoryEnumerator *enumerator = [fileManager enumeratorAtURL:self.url includingPropertiesForKeys:enumeratorKeys options:NSDirectoryEnumerationSkipsHiddenFiles errorHandler:NULL];
     
     // Go through every file and find the right icons
     for (NSURL *subFileURL in enumerator) {
         
         NSString *subFileName = subFileURL.pathComponents.lastObject;
         
-        if ([subFileName isEqualToString:kFaviconFileName]) {
+        if ([subFileName isEqualToString:kFaviconFileName] || [subFileName isEqualToString:kFaviconFileNameAlternative]) {
             
             if (!faviconURL) {
                 
                 faviconURL = subFileURL;
             }
+          
+            break; 
         }
     }
     

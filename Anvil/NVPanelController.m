@@ -736,7 +736,7 @@ static NSString *const kPowPath = @"/Library/LaunchDaemons/cx.pow.firewall.plist
     
         cellView.faviconImageView.backgroundImage = [NSImage imageNamed:@"SiteIcon"];
 //        NSImage *faviconImage = [[NSImage alloc] initWithContentsOfURL:app.faviconURL];
-        
+      
         cellView.faviconImageView.foregroundImage = [self imageRepresentationOfImage:app.faviconImage
                                                                             withSize:NSMakeSize(32, 32)];
     } else {
@@ -818,6 +818,14 @@ static NSString *const kPowPath = @"/Library/LaunchDaemons/cx.pow.firewall.plist
         
         if (CGSizeEqualToSize(representation.size, size)) {
             requestedRepresentationImage = [[NSImage alloc] initWithData:[representation TIFFRepresentation]];
+        } else {
+          NSImage *sourceImage = image;
+          requestedRepresentationImage = [[NSImage alloc] initWithSize: size];
+          [requestedRepresentationImage lockFocus];
+          [sourceImage setSize: size];
+          [[NSGraphicsContext currentContext] setImageInterpolation:NSImageInterpolationHigh];
+          [sourceImage drawAtPoint:NSZeroPoint fromRect:CGRectMake(0, 0, size.width, size.height) operation:NSCompositeCopy fraction:1.0];
+          [requestedRepresentationImage unlockFocus];
         }
     }
     

@@ -757,7 +757,7 @@
 				ORGANIZATIONNAME = Riot;
 				TargetAttributes = {
 					4FBFA35515C6F85800BA8209 = {
-						DevelopmentTeam = 9HNHHQLWA5;
+						DevelopmentTeam = L7S88Y26QL;
 					};
 				};
 			};
@@ -979,7 +979,6 @@
 		4FBFA37515C6F85800BA8209 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "3rd Party Mac Developer Application: S Schofield (9HNHHQLWA5)";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -1001,7 +1000,6 @@
 		4FBFA37615C6F85800BA8209 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "3rd Party Mac Developer Application: S Schofield (9HNHHQLWA5)";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = NO;
 				FRAMEWORK_SEARCH_PATHS = (
