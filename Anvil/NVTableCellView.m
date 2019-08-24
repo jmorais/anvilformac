@@ -68,7 +68,7 @@
         [self.localLabel setText:@".hammer.dev"];
     } else {
         
-        [self.localLabel setText:@".dev"];
+        [self.localLabel setText:@".test"];
     }
 }
 

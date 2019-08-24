@@ -304,9 +304,9 @@ static NSString *const kPowPath = @"/Library/LaunchDaemons/cx.pow.firewall.plist
     [NSApp activateIgnoringOtherApps:YES];
     [self.window becomeMainWindow];
 
-    [self checkWhetherPowIsRunning];
+//    [self checkWhetherPowIsRunning];
     [self performSelector:@selector(checkWhetherPowIsRunning) withObject:nil afterDelay:1.0];
-    [self performSelector:@selector(checkWhetherPowIsRunning) withObject:nil afterDelay:2.0];
+//    [self performSelector:@selector(checkWhetherPowIsRunning) withObject:nil afterDelay:2.0];
 
     [self forcePanelToBeOpen];
     
@@ -409,7 +409,7 @@ static NSString *const kPowPath = @"/Library/LaunchDaemons/cx.pow.firewall.plist
         [self createTrackingArea];
     }
     
-//    NSLog(@"Open. Switch to %@", self.isPowRunning ? @"yes" : @"no");
+    NSLog(@"Open. Switch to %@", self.isPowRunning ? @"yes" : @"no");
     [self.switchView switchToWithoutCallbacks:self.isPowRunning withAnimation:NO];
     self.switchLabel.text = self.isPowRunning ? @"ON" : @"OFF";
     [self.appListTableView reloadData];
@@ -1261,44 +1261,43 @@ static NSString *const kPowPath = @"/Library/LaunchDaemons/cx.pow.firewall.plist
 }
 
 - (BOOL)checkWhetherPowIsRunning {
+    NSLog(@"check if pow is running");
 
-    NSTask *task = [[NSTask alloc] init];
-    [task setLaunchPath:@"/usr/bin/curl"];
-    [task setArguments:@[@"127.0.0.1:20559"]];
-//    [task setArguments:[NSArray arrayWithObjects:@"-I", @"--connect-timeout", @"5", @"-H", @"host:pow", @"localhost:20559/status.json", nil]];
+    NSArray *arguments = [NSArray arrayWithObjects:@"-I", @"-s", @"--connect-timeout", @"5", @"-H", @"host:pow", @"localhost/status.json", nil];
+    NSString *command = @"/usr/bin/curl";
     
-//    NSLog(@"-");
-    [task setStandardInput:[NSPipe pipe]];
-    [task setStandardError:[NSPipe pipe]];
-
-    task.standardOutput = [NSPipe pipe];
-    [[task.standardOutput fileHandleForReading] setReadabilityHandler:^(NSFileHandle *file) {
-        NSData *data = [file availableData]; // this will read to EOF, so call only once
-        
-        // if you're collecting the whole output of a task, you may store it on a property
-        [self.taskOutputData appendData:data];
-        
-        self.isPowRunning = [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] length] > 0;
-//            NSLog(@"Task output - %@", (self.isPowRunning ? @"yes" : @"no"));
-        [self switchSwitchViewToPowStatus];
-    }];
+    NSTask *task    = [[NSTask alloc] init];
+    task.launchPath = command;
+    task.arguments  = arguments;
     
-    [task setTerminationHandler:^(NSTask *task) {
-        
-        BOOL running = [[[NSString alloc] initWithData:self.taskOutputData encoding:NSUTF8StringEncoding] length] > 0;
-        self.isPowRunning = running;
-        self.taskOutputData = [[NSMutableData alloc] init];
-    }];
+    NSPipe *pipe    = [NSPipe pipe];
+    task.standardOutput = pipe;
     
-//    NSLog(@"Launching task...");
+    NSFileHandle *fileHandle = [pipe fileHandleForReading];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(powServerStatusChecker:)
+                                                 name:NSFileHandleDataAvailableNotification
+                                               object:fileHandle];
+    
+    [fileHandle waitForDataInBackgroundAndNotify];
     [task launch];
     
     return NO;
 }
 
+- (void)powServerStatusChecker:(NSNotification *)notification {
+    NSString *test = [[NSString alloc] initWithData:[notification.object availableData] encoding:NSUTF8StringEncoding];
+    NSLog(@"%@", test);
+    
+    BOOL running = [test containsString:@"200 OK"];
+    self.isPowRunning = running;
+    [self switchSwitchViewToPowStatus];
+}
+
 - (void)setIsPowRunning:(BOOL)isPowRunning {
     _isPowRunning = isPowRunning;
-//    NSLog(@"Pow running: %@", isPowRunning ? @"yes" : @"no");
+    NSLog(@"Pow running: %@", isPowRunning ? @"yes" : @"no");
 }
 
 #pragma mark - Clicking and actions
