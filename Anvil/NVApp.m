@@ -148,7 +148,7 @@ static NSString *const kPrecomposedAppleTouchIconFileName = @"apple-touch-icon-p
 
 - (NSURL *)browserURL {
     
-    return [NSURL URLWithString:[NSString stringWithFormat:@"http://%@.dev", self.name]];
+    return [NSURL URLWithString:[NSString stringWithFormat:@"http://%@.test", self.name]];
 }
 
 #pragma mark - Actions
